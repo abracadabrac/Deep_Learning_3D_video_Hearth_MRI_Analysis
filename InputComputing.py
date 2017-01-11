@@ -3,13 +3,13 @@ import os
 import numpy as np
 from matplotlib import cm
 import matplotlib.pyplot as plt
-import time
 
+    # image adress only
 def compute_inpute_dir(Path):
     dictPatients = {}  # create an empty dictonary
     num_patient=0   # numero courant du patient
     for dirName, subdirList, fileList in os.walk(Path):
-        if(len(subdirList) == 1):   # true <=> dirName = dossier racine d'un patient
+        if(len(subdirList) == 1):   # true <=> dirName = dossier racine d'un patient       
             lstCoupes = []  # La liste des coupes contients les image, elle est contenue par la liste des patients
             indice_str = dirName.find('/',len(dirName)-5)       #indice du numero du patient dans le nom du dossier
             num_patient = int(dirName[indice_str+1:indice_str+5])
@@ -20,8 +20,29 @@ def compute_inpute_dir(Path):
             lstCoupes.append(lstimage)
             dictPatients[num_patient] = lstCoupes   #mise a jour du dico           
     return dictPatients
+    
+    
+def compute_inpute_list(Path):
+    lstPatients = np.zeros(compute_nb_patients(Path), dtype = object)  # create np.array of size nb_patients
+    num_patient=1   # numero courant du patient
+    lstCoupes = []
+    for dirName, subdirList, fileList in os.walk(Path):
+        if(len(subdirList) == 1):   # true <=> dirName = dossier racine d'un patient
+            lstPatients[num_patient-1] = lstCoupes
+            lstCoupes = []  # La liste des coupes contients les image, elle est contenue par la liste des patients
+            indice_str = dirName.find('/',len(dirName)-5)       #indice du numero du patient dans le nom du dossier
+            num_patient = int(dirName[indice_str+1:indice_str+5])
+        if(len(subdirList) == 0):   # true <=> dirName = dossier d'une coupe contenant les images 
+            lstimage = []
+            for filname in fileList:
+                file_name = dirName+'/'+filname
+                img = dicom.read_file(file_name).pixel_array 
+                lstimage.append( img )  
+            lstCoupes.append(lstimage) # mise a jour de la list   
+    return lstPatients
 
-def compute_inpute(Path, nb_fix_coupes):
+    # compute a rectangular input
+def compute_inpute_list_rect(Path, nb_fix_coupes):
     nb_patient_selected = compute_nb_patient_selected(Path, nb_fix_coupes)  
     # on restreint aux patients eyant plus que nb_fix_coupes coupes
     x_input = np.zeros(nb_patient_selected, nb_fix_coupes )  # create an empty dictonary
@@ -105,8 +126,27 @@ plt.plot(vect_y_size)
 '''
             
     
-Path = "/Volumes/LaCie/PFE_INSERM_IRM_Data/train"  
-# Path = "/Users/charles/Workspace/Sample_TrainSet_IRM_images"
+# Path = "/Volumes/LaCie/PFE_INSERM_IRM_Data/train"  
+Path = "/Users/charles/Workspace/Sample_TrainSet_IRM_images"
 # nb_fix_coupes = 12
 
+input_dcm = compute_inpute_list(Path)
+input_dcm_Patient1 = input_dcm[0]
+input_dcm_Patient1_coupe1 = input_dcm_Patient1[0]
+
+
+input_path = compute_inpute_dir(Path)
     
+
+
+
+
+
+
+
+
+
+
+
+
+
