@@ -43,18 +43,37 @@ def compute_inpute_list(Path):
 
     # compute a rectangular input
 def compute_inpute_list_rect(Path, nb_fix_coupes):
-    nb_patient_selected = compute_nb_patient_selected(Path, nb_fix_coupes)  
     # on restreint aux patients eyant plus que nb_fix_coupes coupes
-    x_input = np.zeros(nb_patient_selected, nb_fix_coupes )  # create an empty dictonary
-    
-    '''
-    
-    
-    fonction à ecrire
-    
-    
-    '''
-    return x_input
+    nb_patient_selected = compute_nb_patient_selected(Path, nb_fix_coupes)
+    x_input = np.zeros([nb_patient_selected, nb_fix_coupes, 30, 512, 512] )  # create an empty dictonary
+    list_dir_patient = os.listdir(Path)[1:]
+    for dir_patient in list_dir_patient:
+        print('patient : ' + dir_patient)
+        id_ = int(dir_patient)
+        dir_patient_path = Path + '/' + dir_patient + '/study'
+        lst_dir_coupe = os.listdir(dir_patient_path)
+        if '.DS_Store' in lst_dir_coupe:
+            lst_dir_coupe.remove('.DS_Store')   # on enleve le dossier .DS_Store
+        if len(lst_dir_coupe) > nb_fix_coupes-1:
+            for dir_coupe in lst_dir_coupe:
+                z = lst_dir_coupe.index(dir_coupe)
+                if z < nb_fix_coupes:           # !! how z cuts are selected
+                    print('coupe : ' + str(z+1))
+                    dir_coupe_path = dir_patient_path + '/' + dir_coupe
+                    lst_file_DCM = os.listdir(dir_coupe_path)
+                    for file_DCM in lst_file_DCM:
+                        t = lst_file_DCM.index(file_DCM)
+                        #print('temps : ' + str(t))
+                        file_DCM_path = dir_coupe_path + '/' + file_DCM
+                        img = dicom.read_file(file_DCM_path).pixel_array 
+                        #print( 'patient : ' + dir_patient +  '           |           coupe : ' + dir_coupe )
+                        #plt.pcolormesh(img)
+                        #plt.show()
+                        for x in np.arange(img.shape[0]):
+                            for y in np.arange(img.shape[1]):
+                                x_input[id_, z, t, x, y] = img[x, y]           
+    print(list_index)
+    return x_input, list_index
     
 def compute_nb_patient_selected(Path, nb_fix_coupes):
     nb_patient_selected = 0
@@ -128,23 +147,9 @@ plt.plot(vect_y_size)
     
 # Path = "/Volumes/LaCie/PFE_INSERM_IRM_Data/train"  
 Path = "/Users/charles/Workspace/Sample_TrainSet_IRM_images"
-# nb_fix_coupes = 12
+nb_fix_coupes = 12
 
-input_dcm = compute_inpute_list(Path)
-input_dcm_Patient1 = input_dcm[0]
-input_dcm_Patient1_coupe1 = input_dcm_Patient1[0]
-
-
-input_path = compute_inpute_dir(Path)
-    
-
-
-
-
-
-
-
-
+x_input = compute_inpute_list_rect(Path, nb_fix_coupes)
 
 
 
