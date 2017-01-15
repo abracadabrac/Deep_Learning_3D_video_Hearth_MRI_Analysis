@@ -46,15 +46,20 @@ def compute_inpute_list_rect(Path, nb_fix_coupes):
     # on restreint aux patients eyant plus que nb_fix_coupes coupes
     nb_patient_selected = compute_nb_patient_selected(Path, nb_fix_coupes)
     x_input = np.zeros([nb_patient_selected, nb_fix_coupes, 30, 512, 512] )  # create an empty dictonary
+    list_index = []
+    id_input = -1
     list_dir_patient = os.listdir(Path)[1:]
     for dir_patient in list_dir_patient:
-        print('patient : ' + dir_patient)
-        id_ = int(dir_patient)
         dir_patient_path = Path + '/' + dir_patient + '/study'
         lst_dir_coupe = os.listdir(dir_patient_path)
         if '.DS_Store' in lst_dir_coupe:
             lst_dir_coupe.remove('.DS_Store')   # on enleve le dossier .DS_Store
         if len(lst_dir_coupe) > nb_fix_coupes-1:
+            print(' ')
+            print('         ___### patient ###___ : ' + dir_patient)
+            id_ = int(dir_patient)
+            list_index.append(id_)
+            id_input = id_input + 1
             for dir_coupe in lst_dir_coupe:
                 z = lst_dir_coupe.index(dir_coupe)
                 if z < nb_fix_coupes:           # !! how z cuts are selected
@@ -71,9 +76,19 @@ def compute_inpute_list_rect(Path, nb_fix_coupes):
                         #plt.show()
                         for x in np.arange(img.shape[0]):
                             for y in np.arange(img.shape[1]):
-                                x_input[id_, z, t, x, y] = img[x, y]           
+                                x_input[id_input, z, t, x, y] = img[x, y] 
     print(list_index)
     return x_input, list_index
+
+def Analysis_inpute_list_rect(x_input):
+    shape_ = x_input.shape
+    for id_ in shape_[0]:
+        for z in shape_[1]:
+            for t in shape_[2]:
+                print( 'patient : ' + str(id_) +  '           |           coupe : ' + str(z) )
+                plt.pcolormesh(x_input[id_, z, t, :, :])
+                plt.show()
+
     
 def compute_nb_patient_selected(Path, nb_fix_coupes):
     nb_patient_selected = 0

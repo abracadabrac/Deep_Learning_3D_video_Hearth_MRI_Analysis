@@ -4,11 +4,13 @@
 Created on Janv 2017
 
 @author: Charles Englebert Abracadabrac
+
+The entry of this resolt is rectangular
 """
 
 # %matplotlib inline
 import tensorflow as tf
-#import numpy as np
+import numpy as np
 #from sklearn.metrics import confusion_matrix
 #import time
 #from datetime import timedelta
@@ -100,14 +102,17 @@ def new_fc_layer(input,          # The previous layer.
 
     return layer
 
-x_1 = tf.placeholder(tf.float32, shape = [None,None,None,None])
+
+def new_input_layer():
+    
+    
 
 
 
 
 with tf.Session() as sess:
     
-    print(sess.run(summnum, feed_dict={x_1 : input_dcm_Patient1}))
+    print(sess.run(x_1, feed_dict={x_1 : a }))
     
 
 
