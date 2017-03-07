@@ -51,24 +51,66 @@ class InputImages():
         self.yy_ = xx_
         self.nb_c = x_input_dir[0]['nombre de coupes']
         self.index_last_patient = len(x_input_dir)-1
-        self.id_patient = x_input_dir[0]['id']         
-             
-        
-        
+        self.id_patient = x_input_dir[0]['id']   
+              
     def describeYou(self):
-        print('id_patient         ', str(self.id_patient))
-        print('index_p            ', str(self.index_p))
-        print('index_c            ', str(self.index_c))
-        print('nb_c               ', str(self.nb_c))
-        print('nb_batch           ', str(self.nb_batch))
-        print('index_last_p       ', str(self.index_last_patient))
+        print('description de l hospital')
+        print(' id_patient         ', str(self.id_patient))
+        print(' index_p            ', str(self.index_p))
+        print(' index_c            ', str(self.index_c))
+        print(' nb_c               ', str(self.nb_c))
+        print(' nb_elements        ', str(self.nb_element))
+        print(' index_last_p       ', str(self.index_last_patient))
         
+        # ajoute un patient a l hospital
     def add_patient(self, new_patient):
         self.x_input_dir.append(new_patient)
         self.index_last_patient = len(self.x_input_dir)-1
         
-    def nextElement(self):
+        # ajoute une coupe a un patient
+    def add_coupe(self, index_patient, lst_path, nom):
+        patient = self.x_input_dir[index_patient]
+        num = patient['nombre de coupes']
+        lst_coupe = self.x_input_dir[index_patient]['lst_coupe'][:]
         
+        self.x_input_dir[index_patient]['nombre de coupes'] = num +1
+        
+        coupe = { 'type' : 'coupe',
+            'num' : num,
+            'lst_path' : lst_path, 
+            'nom' : nom }
+            
+        lst_coupe.append(coupe)
+        
+        self.x_input_dir[index_patient]['lst_coupe'] = lst_coupe       
+        
+    def info_patient(self, index_patient):
+        patient = self.x_input_dir[index_patient]
+        
+        print( ' ' )
+        print('description du patient indexe', str(index_patient))
+        print(' id                     ', str(patient['id']))
+        print(' nombre de coupes       ', str(patient['nombre de coupes']))
+        print(' nombre de coupes *     ', str(len(patient['lst_coupe'])))
+        print( ' ' )
+            
+    def info_coupe(self, index_patient, index_coupe, path):
+        patient = self.x_input_dir[index_patient]
+        coupe = patient['lst_coupe'][index_coupe]
+        
+        print( ' ' )
+        print( 'description de la coupe ', str(index_coupe),
+              ' du patient inddexe ', str(index_patient))
+        print(' nombre de coupes       ', str(patient['nombre de coupes']))
+        print(' nom                    ', str(coupe['nom']))
+        print(' num                    ', str(coupe['num']))
+        if path:
+            print(' path   :')
+            print(coupe['lst_path'])
+        print( ' ' )
+            
+            
+    def nextElement(self):      
         # on teste si on a deja recupere tous les patients
         if [self.index_p, self.index_c]  == [self.index_last_patient, self.nb_c - 1] :
             self.uncomplete = False
@@ -115,11 +157,9 @@ class InputImages():
             
             element = self.nextElement()
             
-            #for frame in range(len(element['lst_path'])):
-                
+            #for frame in range(len(element['lst_path'])):                
                 #open_image(self.root + element['lst_path'][frame],self.xx_)
-                
-                
+                                
             dia_volume = element['volume diastolique']
             sys_volume = element['volume systolique']
             
@@ -143,31 +183,21 @@ class InputImages():
             # L est un vecteur aléatoir avec une fois chaque nombre entre 0 et le dernier indice
             lst_index_patient = L[0:int(index_last*val_)]
             for index_patient in lst_index_patient:
-                new_patient = self.temporal_translation( index_patient)
-                self.add_patient(new_patient)
+                self.temporal_translation( index_patient )
                                
     def temporal_translation(self, index_patient):
         frame_0 = random.randrange(10, 21, 1)
         
-        patient = self.x_input_dir[index_patient]
-        new_patient = patient
-        
-        lst_coupe = patient['lst_coupe']
-        new_lst_coupe = []
+        patient = self.x_input_dir[index_patient]        
+        lst_coupe = patient['lst_coupe'][:]
         
         for coupe in lst_coupe:
-            new_coupe = coupe
-            
-            lst_path = coupe['lst_path']
+            nom = coupe['nom']           
+            lst_path = coupe['lst_path'][:]
             new_lst_path = sum([lst_path[frame_0:], lst_path[:frame_0]], [])
             
-            new_coupe['lst_path'] = new_lst_path
-            new_lst_coupe.append(new_coupe)
-            
-        new_patient['lst_coupe'] = new_lst_coupe
+            self.add_coupe( index_patient, new_lst_path, nom)           
         
-        return new_patient
-                   
 def test(iip):
     iip.nextElement()
     print(' ')
@@ -182,7 +212,7 @@ if __name__ == '__main__':
     x_input = list(np.load("x_input_train_test.npy"))
 
     xx_ = 256
-    iip = InputImages( root, x_input[:3], xx_)
+    iip = InputImages( root, x_input[0:2], xx_)
     
     debut = time.time()
     #Batch_ = iip.nextBatch(10)
@@ -190,14 +220,22 @@ if __name__ == '__main__':
     
     print(' ')
     iip.describeYou()    
-    iip.data_augmentation( 'temporal_translation', 0.5)
+    iip.data_augmentation( 'temporal_translation', 1)
     print(' ')
-    iip.describeYou()
 
     iip.x_input_dir
+    
+    
+    
+    
+    
+    iip.info_patient(0)
+    print(' ')
+    iip.info_coupe(0,0, 1)
+    print(' ')
+    iip.info_coupe(0,-1, 1)
+    
     # print(Batch_)    
-
-
 
 
 

@@ -181,8 +181,8 @@ def A_2(x_images_train_test):
 
 if __name__ == '__main__':
 
-    Path = '/Users/charles/Workspace/PFE/data/'
-    Path_Images = Path + 'IRM_images/'
+    Path = '/usr/users/promo2017/englebert_cha/Workspace/data/'
+    Path_Images = Path + 'Images/'
     Path_Volumes = Path + 'Volumes/'
 
     x_images_train_test = compute_images_rect_coupe(Path_Images)
