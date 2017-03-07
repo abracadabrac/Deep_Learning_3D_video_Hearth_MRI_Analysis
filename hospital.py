@@ -5,10 +5,11 @@ Created on Thu Feb  2 10:28:56 2017
 
 @author: charles
 """
-import dicom
+#import dicom
 import numpy as np
 import time
 import random
+#import pp_execution as pp
 
 def open_image(file_DCM_path, im_size):
     img = dicom.read_file(file_DCM_path).pixel_array
@@ -18,7 +19,7 @@ def open_image(file_DCM_path, im_size):
     img_carre[0:im_shape[0],0:im_shape[1]] = img
     return img_carre
 
-class InputImages():
+class Hospital():
    
     
     
@@ -99,22 +100,58 @@ class InputImages():
         coupe = patient['lst_coupe'][index_coupe]
         
         print( ' ' )
-        print( 'description de la coupe ', str(index_coupe),
-              ' du patient inddexe ', str(index_patient))
+        print('description de la coupe ', str(index_coupe),
+              ' du patient indexe ', str(index_patient))
         print(' nombre de coupes       ', str(patient['nombre de coupes']))
         print(' nom                    ', str(coupe['nom']))
         print(' num                    ', str(coupe['num']))
+        print(' taille du path         ', str(len(coupe['lst_path'])))
         if path:
             print(' path   :')
             print(coupe['lst_path'])
         print( ' ' )
+
+
+    def summarize_patient(self, id_):    
+        for patient in self.x_input_dir:
+            if patient['id'] == id_:
+                print('descpition du patient id ', str(id_))
+                index_patient = self.x_input_dir.index(patient)
+                print(' index du patient     ', str(index_patient))
+                print(' volume diastolique   ', patient['volume diastolique'])
+                print(' volume systolique    ', patient['volume systolique'])
+                print(' nombre de coupes     ', patient['nombre de coupes'])
+                return              
+        print('id not found')
+
+    def getCoupeIndex(self, index_patient, type):
+        
+        patient = self.x_input_dir[index_patient]
+        print('id patient ', str(patient['id']))
+        lst_coupe = patient['lst_coupe']
+        lst_indexCoupe = []
+        for coupe in lst_coupe :
+            print(coupe['nom'][0:3])
+            if coupe['nom'][0:3] == type:
+                lst_indexCoupe.append(lst_coupe.index(coupe))   
+        return lst_indexCoupe
             
-            
+    def nextCoupe(self):
+        self.index_c = self.index_c + 1        
+        if self.index_c == self.nb_c :
+            if self.index_p  != self.index_last_patient:
+                self.index_p = self.index_p + 1
+                self.index_c = 0
+                self.nb_c = x_input[self.index_p]['nombre de coupes']
+                self.id_patient = x_input[self.index_p]['id']  
+            else:       # vrai si dernier element
+                self.index_c = self.nb_c - 1
+        
     def nextElement(self):      
         # on teste si on a deja recupere tous les patients
         if [self.index_p, self.index_c]  == [self.index_last_patient, self.nb_c - 1] :
             self.uncomplete = False
-            return {'lst_path' : [],            # ceci est une coupe vide
+            return {'lst_path' : [],            # ceci est un element vide
                   'volume diastolique' : 0,
                   'volume systolique'  : 1 }
         
@@ -133,19 +170,11 @@ class InputImages():
                   'volume systolique'  : sys_volume }
                   
         # mise a jour des indices
-        self.index_c = self.index_c + 1        
-        if self.index_c == self.nb_c :
-            if self.index_p  != self.index_last_patient:
-                self.index_p = self.index_p + 1
-                self.index_c = 0
-                self.nb_c = x_input[self.index_p]['nombre de coupes']
-                self.id_patient = x_input[self.index_p]['id']  
-            else:       # vrai si dernier element
-                self.index_c = self.nb_c - 1
-
-        print(' ')
-        self.describeYou()
+        
+        self.nextCoupe()
         self.nb_element = self.nb_element + 1
+        #print(' ')
+        #self.describeYou()
         return element
 
     def nextBatch(self, batchSize):
@@ -157,8 +186,8 @@ class InputImages():
             
             element = self.nextElement()
             
-            #for frame in range(len(element['lst_path'])):                
-                #open_image(self.root + element['lst_path'][frame],self.xx_)
+            for frame in range(len(element['lst_path'])):                
+                
                                 
             dia_volume = element['volume diastolique']
             sys_volume = element['volume systolique']
@@ -198,42 +227,36 @@ class InputImages():
             
             self.add_coupe( index_patient, new_lst_path, nom)           
         
-def test(iip):
-    iip.nextElement()
+def test(hosp):
+    hosp.nextElement()
     print(' ')
-    iip.describeYou()
+    hosp.describeYou()
     print(' ')
+
+def sumarization_1(hosp):
+    print(' ')
+    hosp.summarize_patient(721)
+    print(' ')
+    hosp.info_coupe(21,0, 0)
+    print(' ')
+    hosp.info_coupe(21,-1, 0)
 
 
 
 if __name__ == '__main__':
 
-    root = '/Users/charles/Workspace/PFE/Sample_TrainSet_IRM_images_10/IRM_images/train_test/'
-    x_input = list(np.load("x_input_train_test.npy"))
+    root = '/usr/users/promo2017/englebert_cha/Workspace/data/Images'
+    x_input = list(np.load("x_input.npy"))
 
-    xx_ = 256
-    iip = InputImages( root, x_input[0:2], xx_)
+    xx_ = 218
+    hosp = Hospital( root, x_input, xx_ )
     
-    debut = time.time()
-    #Batch_ = iip.nextBatch(10)
-    fin = time.time()
-    
-    print(' ')
-    iip.describeYou()    
-    iip.data_augmentation( 'temporal_translation', 1)
-    print(' ')
 
-    iip.x_input_dir
-    
-    
-    
-    
-    
-    iip.info_patient(0)
-    print(' ')
-    iip.info_coupe(0,0, 1)
-    print(' ')
-    iip.info_coupe(0,-1, 1)
+    Batch_ = hosp.nextBatch(50)
+
+    hosp.getCoupeIndex(10,'sax')
+   
+   
     
     # print(Batch_)    
 

@@ -1,0 +1,12 @@
+# HTTP Cookie File for domains related to kaggle.com.
+# Downloaded with cookies.txt Chrome Extension (https://chrome.google.com/webstore/detail/njabckikapfpffapmjgojcnbfjonfjfg)
+# Example:  wget -x --load-cookies cookies.txt https://www.kaggle.com/c/second-annual-data-science-bowl/data
+#
+www.kaggle.com	FALSE	/	TRUE	1518953270	ai_user	+XJsN|2017-02-18T11:27:50.244Z
+.kaggle.com	TRUE	/	FALSE	1550493135	_ga	GA1.2.932146822.1487421135
+.www.kaggle.com	TRUE	/	FALSE	0	ARRAffinity	8f81dcb4f60aad9def7fc03703acc58dc723ee6243b9d0f3e53ea350e9f36520
+www.kaggle.com	FALSE	/	TRUE	0	__RequestVerificationToken	GLXSl8hX3oXKeSjmVvNlD7MmQmKoLUdk94ESErEaCsRq8yTmPglrmT7N9t5jGlYrgWv83aGXZYHbQm-V04qCoFIvqvo1
+.kaggle.com	TRUE	/	TRUE	1550506822	.ASPXAUTH	4DF2D307F48D9777409F081E7C83B04F7ADD360B594FE061D292D9061783A8D8FF6AC143E8307A00A209ECA237CF739D9C0A7B534D7DD465A40EC0092EFCF2DF82D475272D214EE8320ACF282EECFC45D23867C8
+www.kaggle.com	FALSE	/	TRUE	0	TempData	.LgCXEoET6Z+aZ59KVJaQxVXBKAlJbAcMWan1EETejNR49I1cLvpmRj/o4mnGq7oOdYD6NuKId6G7F3HnW7m2eaBgof8=
+www.kaggle.com	FALSE	/	TRUE	1487436867	ai_session	735V9|1487434791603|1487435067378.795
+
