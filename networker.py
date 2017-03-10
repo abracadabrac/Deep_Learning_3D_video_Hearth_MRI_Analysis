@@ -49,10 +49,13 @@ def new_fc_layer(input,
         layer = tf.nn.relu(layer)
     return layer
 
-def crps(true, pred):
-
-    return np.sum(np.square(true - pred)) / true.size
-
+def crps(true_, pred_, batch_size):
+    print('##########################')
+    if batch_size != 0:
+        dem = 2*batch_size
+        return tf.sqrt(tf.reduce_sum(tf.square(true_ - pred_))) / dem
+    else:
+        return 1
 
 def real_to_cdf(y, sigma=1e-10):
 
@@ -60,4 +63,3 @@ def real_to_cdf(y, sigma=1e-10):
     for i in range(y.shape[0]):
         cdf[i] = norm.cdf(np.linspace(0, 599, 600), y[i], sigma)
     return cdf
-

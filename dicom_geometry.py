@@ -70,14 +70,28 @@ def dicom_to_3d(filename):
 def normalize_frame(frame, dx0, dy0, nx0, ny0, x, y, offx, offy):
     ny, nx = frame.shape  # SWITCHED
     dx, dy = (x[1], y[1])
-    ox = int(max(min(np.round(offx * dx / dx0 - nx0 / 2),
-                     np.floor(nx * dx / dx0 - nx0 - 0.5)), 0))
-    oy = int(max(min(np.round(offy * dy / dy0 - ny0 / 2),
-                     np.floor(ny * dy / dy0 - ny0 - 0.5)), 0))
+    
+    ox = int(np.round(offx * dx / dx0 - nx0 / 2))
+    oy = int(np.round(offy * dy / dy0 - ny0 / 2))
+    
     x0 = np.arange(0.0, x[-1], dx0)
     y0 = np.arange(0.0, y[-1], dy0)
     interp_function = itp.RectBivariateSpline(y, x, frame)
     z0 = interp_function(y0, x0)
+    
+    nl, nc = z0.shape
+    
+    if ox < 0:
+        ox = 0
+    
+    if ox + nx0 > nc:
+        ox = nc - nx0
+        
+    if oy < 0:
+        oy = 0
+    
+    if oy + ny0 > nl:
+        oy = nl - ny0 
 
     return z0[oy:(oy + ny0), ox:(ox + nx0)]
 

@@ -1,4 +1,5 @@
 import os
+import sys
 import numpy as np
 import pandas as pd
 
@@ -72,6 +73,7 @@ def compute_volume_true_train_test(Path):
 ## images ##
 def compute_images_rect_coupe(Path):
     lst_patient = []
+    regected_index_patient = []
 
     list_dir_patient = os.listdir(Path)
     if '.DS_Store' in list_dir_patient:
@@ -79,7 +81,6 @@ def compute_images_rect_coupe(Path):
         
     for dir_patient in list_dir_patient:
         id_ = int(dir_patient)
-        print(' ')
         print('id patient    ', id_)
         dir_patient_path = dir_patient + '/study'
         lst_dir_coupe = os.listdir(Path + dir_patient_path)
@@ -95,8 +96,9 @@ def compute_images_rect_coupe(Path):
             lst_path = []
             dir_coupe_path = dir_patient_path + '/' + dir_coupe
             lst_file_DCM = os.listdir(Path + '/' + dir_coupe_path)
-                
-            
+
+            if (len(lst_file_DCM) != 30) & (z == 0):
+                regected_index_patient.append(id_)
 
             if len(lst_file_DCM) == 30:
 
@@ -107,24 +109,28 @@ def compute_images_rect_coupe(Path):
                 lst_coupe.append({'type' : 'coupe',
                     'num' : num_coupe,
                     'lst_path' : lst_path,
-                    'nom' : dir_coupe})
+                    'nom' : dir_coupe,
+                    'desactivate' : True})
 
                 num_coupe = num_coupe + 1
             
             del lst_path
             
         if len(lst_coupe) != 0:
-            if len(lst_coupe):
-      
-                lst_patient.append({'type' : 'patient',
-                'id' : id_,
-                'lst_coupe' : lst_coupe,
-                'volume diastolique' : -1,
-                'volume systolique' : -1,
-                'nombre de coupes' : num_coupe})
+            print('           *')
+            lst_patient.append({'type' : 'patient',
+            'id' : id_,
+            'lst_coupe' : lst_coupe,
+            'volume diastolique' : -1,
+            'volume systolique' : -1,
+            'nombre de coupes' : num_coupe})
+        else:
+            print(' ')
         
         del lst_coupe
         
+    print('patients regete par ou exce manque de frame : ')
+    print(regected_index_patient)
     return lst_patient
     
     
@@ -134,9 +140,9 @@ def merge_images_volumes(x_images, y_true):
     for patient in x_images:
         id_ = patient['id']
         index_ = x_images.index(patient)
-        print(' ')
-        print('merge id     ', str(id_))
-        print('merge index  ',str(index_))
+        #print(' ')
+        #print('merge id     ', str(id_))
+        #print('merge index  ',str(index_))
         x_images[index_]['volume diastolique'] = y_true[id_]['dia_volum']
         x_images[index_]['volume systolique']  = y_true[id_]['sys_volum']
         
@@ -168,11 +174,11 @@ def A_1(x_input):
             
 def A_2(x_images_train_test):
     print(' ')
-    print(' pateint 1 : ')
-    summarize_patient(x_images_train_test, 1)
+    print(' pateint 1138 : ')
+    summarize_patient(x_images_train_test, 1138)
     print(' ')
-    print(' pateint 3 : ')
-    summarize_patient(x_images_train_test, 3)
+    print(' pateint 1001 : ')
+    summarize_patient(x_images_train_test, 1001)
     print(' ')
     print(' pateint 50 : ')
     summarize_patient(x_images_train_test, 50)
@@ -189,21 +195,29 @@ def A_2(x_images_train_test):
 
 if __name__ == '__main__':
 
-    Path = '/usr/users/promo2017/englebert_cha/Workspace/data/'
-    Path_Images = Path + 'Images/'
-    Path_Volumes = Path + 'Volumes/'
+    #Path = '/usr/users/promo2017/englebert_cha/Workspace/data'
+    Path = sys.argv[1]                      # commande : ipython3 InputComputing.py votre_path
+                                            # avec votre path la racine du dossier contenant vos dossier parient
+                                            # patient et volumes
+    Path_Images = Path + '/Images/'     # c est a dire train test ou validate
+    Path_Volumes = Path + '/Volumes/'       # le dossier des csv des volumes
 
-    x_images_train_test = compute_images_rect_coupe(Path_Images)
-    y_true_train_test_validate = compute_volume_true_train_test_validate(Path_Volumes)
-    merge_images_volumes(x_images_train_test, y_true_train_test_validate)
+    x_images = compute_images_rect_coupe(Path_Images)               #les images
+    y_true = compute_volume_true_train_test_validate(Path_Volumes)  # les volumes
+
+    merge_images_volumes(x_images, y_true)                          # fusion des deux
     
-    A_2(x_images_train_test)
-    #A_2(x_images_train_test)
     
         
-    np.save('x_input.npy', x_images_train_test)
+    np.save('x_input.npy', x_images)                    # sauvegarde des donnees
+
+    # np.save('x_input_train.npy', x_images)        #si doc de train
+    # np.save('x_input_test.npy', x_images)         #si doc de test ...
 
 
 
 
-    
+
+
+
+
