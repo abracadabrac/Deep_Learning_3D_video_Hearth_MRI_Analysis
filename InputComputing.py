@@ -199,7 +199,7 @@ if __name__ == '__main__':
     Path = sys.argv[1]                      # commande : ipython3 InputComputing.py votre_path
                                             # avec votre path la racine du dossier contenant vos dossier parient
                                             # patient et volumes
-    Path_Images = Path + '/Images/'     # c est a dire train test ou validate
+    Path_Images = Path + '/nom_dir_image/'  # c est a dire train test ou validate
     Path_Volumes = Path + '/Volumes/'       # le dossier des csv des volumes
 
     x_images = compute_images_rect_coupe(Path_Images)               #les images
